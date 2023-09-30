@@ -47,7 +47,7 @@
       posX2 = 0,
       posInitial,
       posFinal,
-      threshold = 100,
+      threshold = items.getElementsByClassName("slide")[0].offsetWidth < 500 ? 40 :100,
       slides = items.getElementsByClassName("slide"),
       slidesLength = slides.length,
       slideSize = items.getElementsByClassName("slide")[0].offsetWidth,
