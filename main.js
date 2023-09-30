@@ -47,7 +47,7 @@
       posX2 = 0,
       posInitial,
       posFinal,
-      threshold = items.getElementsByClassName("slide")[0].offsetWidth < 500 ? 40 :100,
+      threshold =  items.getElementsByClassName("slide")[0].offsetWidth / 10,
       slides = items.getElementsByClassName("slide"),
       slidesLength = slides.length,
       slideSize = items.getElementsByClassName("slide")[0].offsetWidth,
@@ -88,10 +88,10 @@
       e = e || window.event;
       const { x } = getTranslateValues(items);
       if (e.type == "touchmove") {
-        posX2 = (posX1 - e.touches[0].clientX)*slideSize;
+        posX2 = (posX1 - e.touches[0].clientX)*threshold;
         posX1 = e.touches[0].clientX;
       } else {
-        posX2 = (posX1 - e.clientX)*slideSize;
+        posX2 = (posX1 - e.clientX)*threshold;
         posX1 = e.clientX;
       }
       items.style.transform = `translateX(${parseInt(x) - parseInt(posX2)}px)`;
@@ -125,11 +125,8 @@
               parseInt(posInitial) - parseInt(slideSize)
             }px)`;
             index++;
-          }
-          if(index === slidesLength - 1){
-            items.style.transform = `translateX(${
-              parseInt(posInitial)
-            }px)`;
+          }else{
+            items.style.transform = `translateX(${parseInt(posInitial)}px)`;
           }
         } else if (dir == -1) {
           if (index !== 0) {
@@ -137,12 +134,8 @@
               parseInt(posInitial) + parseInt(slideSize)
             }px)`;
             index--;
-          }
-          if(index === 0)
-          {
-            items.style.transform = `translateX(${
-              parseInt(posInitial)
-            }px)`;
+          }else{
+            items.style.transform = `translateX(${parseInt(posInitial)}px)`;
           }
         }
       }
