@@ -42,6 +42,8 @@
       };
     }
   }
+
+  
   function slide(items, prev, next) {
     var posX1 = 0,
       posX2 = 0,
@@ -60,6 +62,12 @@
     items.addEventListener("touchend", dragEnd);
     items.addEventListener("touchmove", dragAction);
 
+    window.addEventListener('resize', () => {
+      slideSize = items.getElementsByClassName("slide")[0].clientWidth;
+      threshold = slideSize / 10,
+      items.style.transform = 'translateX(' + (-slideSize * index ) + 'px)'
+    })
+    
     // click event
     prev.addEventListener("click", function () {
       shiftSlide(-1);
