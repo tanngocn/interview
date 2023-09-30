@@ -1,120 +1,171 @@
-document.addEventListener("DOMContentLoaded", function () {
-  const wrapper = document.getElementsByClassName("wrapper")[0];
-  const nextSlide = document.getElementsByClassName("next-slide")[0];
-  const prevSlide = document.getElementsByClassName("prev-slide")[0];
-  const slides = document.getElementsByClassName("slide-item");
-  const slideActive = document.getElementsByClassName("slide-item active")[0];
-  const numsSlide = slides.length;
-  let endX = 0;
-  let initialX = 0;
-  let initialEnd = 0;
-  let initialStart = 0;
+  const sliderItems = document.getElementById("slide-wrapper");
+  const next = document.getElementById("next-slide");
+  const prev = document.getElementById("prev-slide");
+  slide(sliderItems, prev, next);
 
-  let currentSlide = checkCurrentSlideActive();
+  function getTranslateValues(element) {
+    const style = window.getComputedStyle(element);
+    const matrix =
+      style["transform"] || style.webkitTransform || style.mozTransform;
 
-  nextSlide.addEventListener("click", function () {
-    handleClick("next");
-  });
-  prevSlide.addEventListener("click", function () {
-    handleClick("prev");
-  });
-  wrapper.addEventListener("touchstart", startTouch, { passive: false });
-  wrapper.addEventListener("touchend", endTouch, false);
-  wrapper.addEventListener("touchmove", moveTouch, { passive: false });
-  wrapper.addEventListener("mousedown", startMousedown, false);
-  wrapper.addEventListener("mouseup", startMouseup, false);
-
-  function checkStatusBtn(currentSlide) {
-    if (currentSlide !== 0 && currentSlide !== numsSlide - 1) {
-      nextSlide.classList.remove("disabled");
-      prevSlide.classList.remove("disabled");
+    // No transform property. Simply return 0 values.
+    if (matrix === "none" || typeof matrix === "undefined") {
+      return {
+        x: 0,
+        y: 0,
+        z: 0,
+      };
     }
-    if (currentSlide === 0) {
-      prevSlide.classList.add("disabled");
+
+    // Can either be 2d or 3d transform
+    const matrixType = matrix.includes("3d") ? "3d" : "2d";
+    const matrixValues = matrix.match(/matrix.*\((.+)\)/)[1].split(", ");
+
+    // 2d matrices have 6 values
+    // Last 2 values are X and Y.
+    // 2d matrices does not have Z value.
+    if (matrixType === "2d") {
+      return {
+        x: matrixValues[4],
+        y: matrixValues[5],
+        z: 0,
+      };
     }
-    if (currentSlide === numsSlide - 1) {
-      nextSlide.classList.add("disabled");
+
+    // 3d matrices have 16 values
+    // The 13th, 14th, and 15th values are X, Y, and Z
+    if (matrixType === "3d") {
+      return {
+        x: matrixValues[12],
+        y: matrixValues[13],
+        z: matrixValues[14],
+      };
     }
   }
+  function slide(items, prev, next) {
+    var posX1 = 0,
+      posX2 = 0,
+      posInitial,
+      posFinal,
+      threshold = 100,
+      slides = items.getElementsByClassName("slide"),
+      slidesLength = slides.length,
+      slideSize = items.getElementsByClassName("slide")[0].offsetWidth,
+      index = 0,
+      allowShift = true;
+    checkIndex();
+    items.onmousedown = dragStart;
+    // Touch events
+    items.addEventListener("touchstart", dragStart);
+    items.addEventListener("touchend", dragEnd);
+    items.addEventListener("touchmove", dragAction);
 
-  function checkCurrentSlideActive() {
-    let result = 0;
-    for (let i = 0; i < slides.length; i++) {
-      if (slides[i].classList.contains("active")) {
-        wrapper.style.transform = `translate3d(${
-          -i * slideActive.offsetWidth
-        }px, 0px, 0px)`;
-        initialX = -i * slideActive.offsetWidth;
-        result = i;
-        checkStatusBtn(i);
-        break;
+    // click event
+    prev.addEventListener("click", function () {
+      shiftSlide(-1);
+    });
+    next.addEventListener("click", function () {
+      shiftSlide(1);
+    });
+
+    items.addEventListener("transitionend", checkIndex);
+
+    function dragStart(e) {
+      e = e || window.event;
+      e.preventDefault();
+      const { x } = getTranslateValues(items);
+      posInitial = x ;
+
+      if (e.type == "touchstart") {
+        posX1 = e.touches[0].clientX;
+      } else {
+        posX1 = e.clientX;
+        document.onmouseup = dragEnd;
+        document.onmousemove = dragAction;
       }
     }
-    return result;
-  }
-
-  function handleClick(type) {
-    if (type === "next") {
-      if (currentSlide !== numsSlide - 1) {
-        currentSlide += 1;
+    function dragAction(e) {
+      e = e || window.event;
+      const { x } = getTranslateValues(items);
+      if (e.type == "touchmove") {
+        posX2 = (posX1 - e.touches[0].clientX)*slideSize;
+        posX1 = e.touches[0].clientX;
+      } else {
+        posX2 = (posX1 - e.clientX)*slideSize;
+        posX1 = e.clientX;
       }
+      items.style.transform = `translateX(${parseInt(x) - parseInt(posX2)}px)`;
     }
 
-    if (type === "prev") {
-      if (currentSlide !== 0) {
-        currentSlide -= 1;
+    function dragEnd(e) {
+      const { x } = getTranslateValues(items);
+      posFinal = x;
+      if (posFinal - posInitial < -threshold) {
+        shiftSlide(1, "drag");
+      } else if (posFinal - posInitial > threshold) {
+        shiftSlide(-1, "drag");
+      } else {
+        items.style.transform = `translateX(${parseInt(posInitial)}px)`;
       }
+      document.onmouseup = null;
+      document.onmousemove = null;
     }
 
-    checkStatusBtn(currentSlide);
-    wrapper.style.transform = `translate3d(${
-      -currentSlide * slideActive.offsetWidth
-    }px, 0px, 0px)`;
-  }
-
-  function startMousedown(e) {
-    initialStart = Date.now();
-    initialX = e.clientX;
-  }
-
-  function startMouseup(e) {
-    initialEnd = Date.now();
-    endX = e.clientX;
-    if (initialEnd - initialStart < 800) {
-      swipe();
-    }
-  }
-
-  function startTouch(e) {
-    initialStart = Date.now();
-    initialX = e.touches[0].clientY;
-  }
-
-  function endTouch(e) {
-    initialEnd = Date.now();
-    endX = e.changedTouches[0].clientY;
-    if (initialEnd - initialStart < 800) {
-      swipe();
-    }
-  }
-
-  function moveTouch(e) {
-    e.preventDefault();
-  }
-
-  function swipe() {
-    if (endX - initialX < -50) {
-      if (currentSlide !== numsSlide - 1) {
-        currentSlide += 1;
+    function shiftSlide(dir, action) {
+      items.classList.add("shifting");
+      const { x } = getTranslateValues(items);
+      if (allowShift) {
+        if (!action) {
+          posInitial = x;
+        }
+      
+        if (dir == 1) {
+          if (index !== slidesLength - 1) {
+            items.style.transform = `translateX(${
+              parseInt(posInitial) - parseInt(slideSize)
+            }px)`;
+            index++;
+          }else{
+            items.style.transform = `translateX(${
+              parseInt(posInitial)
+            }px)`;
+          }
+        } else if (dir == -1) {
+          if (index !== 0) {
+            items.style.transform = `translateX(${
+              parseInt(posInitial) + parseInt(slideSize)
+            }px)`;
+            index--;
+          }else{
+            items.style.transform = `translateX(${
+              parseInt(posInitial)
+            }px)`;
+          }
+        }
       }
-    } else if (endX - initialX > 50) {
-      if (currentSlide !== 0) {
-        currentSlide -= 1;
-      }
+      allowShift = false;
     }
-    checkStatusBtn(currentSlide);
-    wrapper.style.transform = `translate3d(${
-      -currentSlide * slideActive.offsetWidth
-    }px, 0px, 0px)`;
+
+    function checkIndex() {
+      items.classList.remove("shifting");
+      const { x } = getTranslateValues(items);
+      if(x===0){
+        index = 0;
+      }
+      if (index === 0) {
+        prev.classList.add("disabled");
+        next.classList.remove("disabled");
+      }
+
+      if (index === slidesLength - 1) {
+        next.classList.add("disabled");
+        prev.classList.remove("disabled");
+      }
+
+      if (index !== 0 && index !== slidesLength - 1) {
+        next.classList.remove("disabled");
+        prev.classList.remove("disabled");
+      }
+      allowShift = true;
+    }
   }
-});
