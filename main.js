@@ -62,12 +62,14 @@
     items.addEventListener("touchend", dragEnd);
     items.addEventListener("touchmove", dragAction);
 
+
     window.addEventListener('resize', () => {
       slideSize = items.getElementsByClassName("slide")[0].clientWidth;
       threshold = slideSize / 10,
       items.style.transform = 'translateX(' + (-slideSize * index ) + 'px)'
-    })
+      items.style.webkitTransform  = 'translateX(' + (-slideSize * index ) + 'px)'
 
+    })
     // click event
     prev.addEventListener("click", function () {
       shiftSlide(-1);
@@ -83,9 +85,9 @@
       e.preventDefault();
       const { x } = getTranslateValues(items);
       posInitial = x ;
+
       if (e.type == "touchstart") {
-        let touch =  e.originalEvent.touches[0] ||  e.originalEvent.changedTouches[0];
-        posX1 =  touch.pageX;
+        posX1 = e.touches[0].clientX;
       } else {
         posX1 = e.clientX;
         document.onmouseup = dragEnd;
@@ -96,14 +98,14 @@
       e = e || window.event;
       const { x } = getTranslateValues(items);
       if (e.type == "touchmove") {
-        let touch =  e.originalEvent.touches[0] ||  e.originalEvent.changedTouches[0];
-        posX2 = (posX1 - touch.pageX)*threshold ;
-        posX1 = touch.pageX;
+        posX2 = (posX1 - e.touches[0].clientX)*threshold;
+        posX1 = e.touches[0].clientX;
       } else {
         posX2 = (posX1 - e.clientX)*threshold;
         posX1 = e.clientX;
       }
       items.style.transform = `translateX(${parseInt(x) - parseInt(posX2)}px)`;
+      items.style.webkitTransform  = `translateX(${parseInt(x) - parseInt(posX2)}px)`;
     }
 
     function dragEnd(e) {
@@ -115,6 +117,7 @@
         shiftSlide(-1, "drag");
       } else {
         items.style.transform = `translateX(${parseInt(posInitial)}px)`;
+        items.style.webkitTransform  = `translateX(${parseInt(posInitial)}px)`;
       }
       document.onmouseup = null;
       document.onmousemove = null;
@@ -133,18 +136,26 @@
             items.style.transform = `translateX(${
               parseInt(posInitial) - parseInt(slideSize)
             }px)`;
+            items.style.webkitTransform  = `translateX(${
+              parseInt(posInitial) - parseInt(slideSize)
+            }px)`;
             index++;
           }else{
             items.style.transform = `translateX(${parseInt(posInitial)}px)`;
+            items.style.webkitTransform  = `translateX(${parseInt(posInitial)}px)`;
           }
         } else if (dir == -1) {
           if (index !== 0) {
             items.style.transform = `translateX(${
               parseInt(posInitial) + parseInt(slideSize)
             }px)`;
+            items.style.webkitTransform  = `translateX(${
+              parseInt(posInitial) + parseInt(slideSize)
+            }px)`;
             index--;
           }else{
             items.style.transform = `translateX(${parseInt(posInitial)}px)`;
+            items.style.webkitTransform  = `translateX(${parseInt(posInitial)}px)`;
           }
         }
       }
