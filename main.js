@@ -67,7 +67,7 @@
       threshold = slideSize / 10,
       items.style.transform = 'translateX(' + (-slideSize * index ) + 'px)'
     })
-    
+
     // click event
     prev.addEventListener("click", function () {
       shiftSlide(-1);
@@ -85,7 +85,7 @@
       posInitial = x ;
 
       if (e.type == "touchstart") {
-        posX1 = e.touches[0].clientX;
+        posX1 =  e.originalEvent.touches[0] || e.originalEvent.changedTouches[0];
       } else {
         posX1 = e.clientX;
         document.onmouseup = dragEnd;
@@ -96,7 +96,7 @@
       e = e || window.event;
       const { x } = getTranslateValues(items);
       if (e.type == "touchmove") {
-        posX2 = (posX1 - e.touches[0].clientX)*threshold;
+        posX2 = (posX1 - e.originalEvent.touches[0])*threshold  || (posX1 - e.originalEvent.changedTouches[0])*threshold ;
         posX1 = e.touches[0].clientX;
       } else {
         posX2 = (posX1 - e.clientX)*threshold;
