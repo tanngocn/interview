@@ -49,7 +49,7 @@
       posX2 = 0,
       posInitial,
       posFinal,
-      threshold =  items.getElementsByClassName("slide")[0].offsetWidth / 10,
+      threshold =  items.getElementsByClassName("slide")[0].offsetWidth / 20,
       slides = items.getElementsByClassName("slide"),
       slidesLength = slides.length,
       slideSize = items.getElementsByClassName("slide")[0].offsetWidth,
@@ -65,7 +65,7 @@
 
     window.addEventListener('resize', () => {
       slideSize = items.getElementsByClassName("slide")[0].clientWidth;
-      threshold = slideSize / 10,
+      threshold = slideSize / 20,
       items.style.webkitTransform = 'translateX(' + (-slideSize * index ) + 'px)';
 
     })
@@ -83,8 +83,7 @@
       e = e || window.event;
       e.preventDefault();
       const { x } = getTranslateValues(items);
-      posInitial = x ;
-
+      posInitial = x;
       if (e.type == "touchstart") {
         posX1 = e.touches[0].clientX;
       } else {
@@ -95,7 +94,8 @@
     }
     function dragAction(e) {
       e = e || window.event;
-      const { x } = getTranslateValues(items);
+      let x =index * -slideSize;
+
       if (e.type == "touchmove") {
         posX2 = (posX1 - e.touches[0].clientX)*threshold;
         posX1 = e.touches[0].clientX;
