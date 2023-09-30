@@ -66,8 +66,7 @@
     window.addEventListener('resize', () => {
       slideSize = items.getElementsByClassName("slide")[0].clientWidth;
       threshold = slideSize / 10,
-      items.style.transform = 'translateX(' + (-slideSize * index ) + 'px)'
-      items.style.webkitTransform  = 'translateX(' + (-slideSize * index ) + 'px)'
+      items.style.webkitTransform = 'translateX(' + (-slideSize * index ) + 'px)';
 
     })
     // click event
@@ -104,8 +103,7 @@
         posX2 = (posX1 - e.clientX)*threshold;
         posX1 = e.clientX;
       }
-      items.style.transform = `translateX(${parseInt(x) - parseInt(posX2)}px)`;
-      items.style.webkitTransform  = `translateX(${parseInt(x) - parseInt(posX2)}px)`;
+      items.style.webkitTransform = `translateX(${parseInt(x) - parseInt(posX2)}px)`;
     }
 
     function dragEnd(e) {
@@ -116,7 +114,6 @@
       } else if (posFinal - posInitial > threshold) {
         shiftSlide(-1, "drag");
       } else {
-        items.style.transform = `translateX(${parseInt(posInitial)}px)`;
         items.style.webkitTransform  = `translateX(${parseInt(posInitial)}px)`;
       }
       document.onmouseup = null;
@@ -141,7 +138,6 @@
             }px)`;
             index++;
           }else{
-            items.style.transform = `translateX(${parseInt(posInitial)}px)`;
             items.style.webkitTransform  = `translateX(${parseInt(posInitial)}px)`;
           }
         } else if (dir == -1) {
@@ -154,7 +150,6 @@
             }px)`;
             index--;
           }else{
-            items.style.transform = `translateX(${parseInt(posInitial)}px)`;
             items.style.webkitTransform  = `translateX(${parseInt(posInitial)}px)`;
           }
         }
