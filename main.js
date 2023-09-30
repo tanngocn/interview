@@ -83,9 +83,9 @@
       e.preventDefault();
       const { x } = getTranslateValues(items);
       posInitial = x ;
-
       if (e.type == "touchstart") {
-        posX1 =  e.originalEvent.touches[0] || e.originalEvent.changedTouches[0];
+        let touch =  e.originalEvent.touches[0] ||  e.originalEvent.changedTouches[0];
+        posX1 =  touch.pageX;
       } else {
         posX1 = e.clientX;
         document.onmouseup = dragEnd;
@@ -96,8 +96,9 @@
       e = e || window.event;
       const { x } = getTranslateValues(items);
       if (e.type == "touchmove") {
-        posX2 = (posX1 - e.originalEvent.touches[0])*threshold  || (posX1 - e.originalEvent.changedTouches[0])*threshold ;
-        posX1 = e.touches[0].clientX;
+        let touch =  e.originalEvent.touches[0] ||  e.originalEvent.changedTouches[0];
+        posX2 = (posX1 - touch.pageX)*threshold ;
+        posX1 = touch.pageX;
       } else {
         posX2 = (posX1 - e.clientX)*threshold;
         posX1 = e.clientX;
