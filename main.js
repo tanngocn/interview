@@ -125,7 +125,8 @@
               parseInt(posInitial) - parseInt(slideSize)
             }px)`;
             index++;
-          }else{
+          }
+          if(index === slidesLength - 1){
             items.style.transform = `translateX(${
               parseInt(posInitial)
             }px)`;
@@ -136,7 +137,9 @@
               parseInt(posInitial) + parseInt(slideSize)
             }px)`;
             index--;
-          }else{
+          }
+          if(index === 0)
+          {
             items.style.transform = `translateX(${
               parseInt(posInitial)
             }px)`;
